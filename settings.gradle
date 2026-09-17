@@ -1,0 +1,12 @@
+/*
+ * Created by Marek Gajdoš (gajdosm.sk@gmail.com)
+ * Copyright (c) 2026 Marek Gajdoš & Lukáš Balážik
+ * All rights reserved.
+ *
+ * This source code is part of a school project.
+ * Redistribution, modification, or use outside the scope
+ * of this academic project is not permitted without
+ * explicit permission from the author(s).
+ */
+
+rootProject.name = 'handshake_server'
