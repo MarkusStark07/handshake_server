@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Created / Edited by Marek Gajdoš (gajdosm.sk@gmail.com)
+  ~ Copyright (c) 2026 Marek Gajdoš & Lukáš Balážik
+  ~ All rights reserved.
+  ~
+  ~ This source code is part of a school project.
+  ~ Redistribution, modification, or use outside the scope
+  ~ of this academic project is not permitted without
+  ~ explicit permission from the author(s).
+  -->
+
+<Configuration status="WARN">
+    <Properties>
+        <Property name="logPath">${sys:logPath:-logs}</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Konzolový Appender -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <!-- %level odstráni koncové medzery; celý riadok je zabalený v %highlight -->
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss} [%level] %c{1} - %msg%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=cyan}"/>
+        </Console>
+
+        <!-- Rolling Random Access File Appender (zapisuje do logs/latest.log, archivuje staré logy) -->
+        <RollingRandomAccessFile name="FileAppender"
+                                 fileName="${logPath}/latest.log"
+                                 filePattern="${logPath}/%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%c{1}]: %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <OnStartupTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy max="1000"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Stlmiť podrobné logy Jetty -->
+        <Logger name="org.eclipse.jetty" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Stlmiť podrobné logy Javalin -->
+        <Logger name="io.javalin" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Hlavný Root Logger aplikácie -->
+        <Root level="debug">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
