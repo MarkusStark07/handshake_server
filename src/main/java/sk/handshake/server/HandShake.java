@@ -15,22 +15,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sk.handshake.server.rest.RestServer;
 
+import java.io.IOException;
+
 /**
  * Hlavná trieda projektu HandShake Server.
  * do toho javadocu sa budú postupne pridávať informácie
  */
 public class HandShake {
-    private static final String VERSION = "1.0-ALPHA-DEV"; //TODO: bolo by fajn nejako ťahať verziu z build.gradle
-
-    //NOTE: DOČASNÉ
-    // nastavenie logPath z ConfigurationConstants
-    static {
-        System.setProperty("logPath", ConfigurationConstants.logPath);
-    }
+    private static final String VERSION = "1.1-ALPHA-DEV"; //TODO: bolo by fajn nejako ťahať verziu z build.gradle
 
     private static final Logger log = LogManager.getLogger(HandShake.class);
+    private static final ConfigManager configManager = ConfigManager.getInstance();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // BOOT MESSAGE
         log.info("""
                 
@@ -51,8 +48,11 @@ public class HandShake {
                 ####################################################################""");
         log.info("Version: " + VERSION);
 
-        //ServerConfig config = ServerConfig.fromEnv();
-        RestServer server = new RestServer(/*config*/);
+        // Inicializácia konfigurácie
+        configManager.init();
+
+        // Inicializácia rest servera
+        RestServer server = new RestServer();
         server.start();
 
         // Bezpečné ukončenie s Ctrl+C / SIGTERM

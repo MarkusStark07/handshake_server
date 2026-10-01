@@ -11,10 +11,6 @@
   -->
 
 <Configuration status="WARN">
-    <Properties>
-        <Property name="logPath">${sys:logPath:-logs}</Property>
-    </Properties>
-
     <Appenders>
         <!-- Konzolový Appender -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
@@ -26,8 +22,8 @@
 
         <!-- Rolling Random Access File Appender (zapisuje do logs/latest.log, archivuje staré logy) -->
         <RollingRandomAccessFile name="FileAppender"
-                                 fileName="${logPath}/latest.log"
-                                 filePattern="${logPath}/%d{yyyy-MM-dd}-%i.log.gz">
+                                 fileName="./logs/latest.log"
+                                 filePattern="./logs/%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%c{1}]: %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>

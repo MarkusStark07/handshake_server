@@ -14,7 +14,7 @@ package sk.handshake.server.rest;
 import io.javalin.Javalin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sk.handshake.server.ConfigurationConstants;
+import sk.handshake.server.ConfigManager;
 import sk.handshake.server.rest.controllers.DeviceRestController;
 import sk.handshake.server.rest.controllers.MessageRestController;
 
@@ -26,7 +26,7 @@ import static io.javalin.apibuilder.ApiBuilder.post;
  * Trieda, ktorá predstavuje RESTful server vytvorený pomocou Javalin. Server poskytuje
  * endpointy pre správu správ a zariadení a podporuje spustenie a zastavenie
  * inštancie servera.
- *
+ * <p>
  * Metódy:
  * - {@link #start()}: Inicializuje a spustí Javalin server.
  * - {@link #stop()}: Zastaví bežiacu inštanciu Javalin servera.
@@ -34,6 +34,7 @@ import static io.javalin.apibuilder.ApiBuilder.post;
  */
 public class RestServer {
     private static final Logger log = LogManager.getLogger(RestServer.class);
+    private static final ConfigManager configManager = ConfigManager.getInstance();
 
     private Javalin javalin;
 
@@ -44,7 +45,7 @@ public class RestServer {
      * Spustí REST server.
      * <p>
      * Táto metóda inicializuje Javalin server s registrovanými routes a spustí ho
-     * na IP adrese a porte definovaných v dočasnej triede {@link ConfigurationConstants}.
+     * na IP adrese a porte definovaných v konfigurácií získanej cez {@link ConfigManager}.
      * Po úspešnom spustení zaloguje informačnú správu.
      * </p>
      *
@@ -55,7 +56,7 @@ public class RestServer {
             javalinConfig.routes.apiBuilder(this::registerRoutes);
         });
 
-        javalin.start(ConfigurationConstants.IP, ConfigurationConstants.PORT);
+        javalin.start(configManager.getConfig().getHost(), configManager.getConfig().getPort());
         log.info("Started RestServer");
         return javalin;
     }
@@ -80,7 +81,7 @@ public class RestServer {
      * Registruje všetky REST endpointy servera.
      * <p>
      * Táto metóda inicializuje kontroléry pre správu správ a zariadení a následne
-     * definuje REST API endpointy pomocí Javalin API builderu. Vytvárajú sa dve
+     * definuje REST API endpointy pomocou Javalin API builderu. Vytvárajú sa dve
      * hlavné skupiny endpointov:
      * </p>
      *

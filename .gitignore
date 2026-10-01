@@ -44,3 +44,4 @@ bin/
 
 ### Project Files ###
 /logs/
+/config.json
