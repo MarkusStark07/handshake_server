@@ -13,8 +13,8 @@ package sk.handshake.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sk.handshake.server.domain.Config;
 
 import java.io.File;
@@ -35,6 +35,7 @@ import java.util.Objects;
  * @see Config
  */
 public class ConfigManager {
+    private static final Logger log = LogManager.getLogger(ConfigManager.class);
     // Singleton inštancia ConfigManagera
     private static ConfigManager instance;
 
@@ -52,22 +53,22 @@ public class ConfigManager {
 
     private Config config;
     private static final File configFile = new File(System.getProperty("user.dir") + "/config.json");
-    private static final Logger log = LoggerFactory.getLogger(ConfigManager.class);
 
-    /// Táto metóda sa pokúsi načítať konfiguračný súbor, v prípadeže sa jej to nepodarí vytvorí nový
-    /// na základe default hodnôt atribút doménového objektu {@link Config}
+    /// Inicializuje konfiguračný manažér načítaním konfiguračného súboru.
+    /// Ak konfiguračný súbor neexistuje, vytvorí nový na základe predvolených hodnôt
+    /// atribútov doménového objektu {@link Config}.
     ///
     /// @throws IOException ak zlyhá vytvorenie alebo načítanie konfiguračného súboru
     public void init() throws IOException {
-        try {
-            config = loadConfig();
-            log.info("Successfully loaded config file.");
-        } catch (IOException e) {
-            log.error("Failed to load config file:  {}", String.valueOf(e));
+        // vytvorenie default konfigu z template ak konfiguračný súbor neexistuje
+        if (!configFile.exists()) {
+            log.info("Config file not found, creating template at {}", configFile.getAbsolutePath());
             createTemplate();
-            config = loadConfig();
-            log.info("Successfully created and loaded new config file.");
         }
+
+        // načítanie konfigurácie zo súboru config.json
+        config = loadConfig();
+        log.info("Successfully loaded config file.");
         checkForDefaultConfig(config);
     }
 
@@ -76,11 +77,16 @@ public class ConfigManager {
     ///
     /// @throws IOException ak zlyhá vytvorenie súboru
     private static void createTemplate() throws IOException {
-        Config template = new Config();
+        try {
+            Config template = new Config();
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.writeValue(configFile, template);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.writeValue(configFile, template);
+        } catch (IOException e) {
+            log.fatal("Failed to create config file: {}", configFile.getAbsolutePath(), e);
+            throw e;
+        }
     }
 
     /// Táto metóda načíta konfiguračný súbor.
@@ -89,7 +95,12 @@ public class ConfigManager {
     /// @throws IOException ak zlyhá načítanie súboru
     private static Config loadConfig() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(configFile, Config.class);
+        try {
+            return mapper.readValue(configFile, Config.class);
+        } catch (IOException e) {
+            log.fatal("Failed to load config file: {}", configFile.getAbsolutePath(), e);
+            throw e;
+        }
     }
 
     /// Táto metóda vracia entitu konfigurácie

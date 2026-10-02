@@ -22,7 +22,7 @@ import java.io.IOException;
  * do toho javadocu sa budú postupne pridávať informácie
  */
 public class HandShake {
-    private static final String VERSION = "1.1-ALPHA-DEV"; //TODO: bolo by fajn nejako ťahať verziu z build.gradle
+    private static final String VERSION = "1.1.1-ALPHA-DEV"; //TODO: bolo by fajn nejako ťahať verziu z build.gradle
 
     private static final Logger log = LogManager.getLogger(HandShake.class);
     private static final ConfigManager configManager = ConfigManager.getInstance();
